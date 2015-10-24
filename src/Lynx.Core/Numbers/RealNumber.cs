@@ -5,7 +5,7 @@ namespace Lynx.Core.Numbers
     /// <summary>
     /// Class representing a real number
     /// </summary>
-    public class RealNumber : Number
+    public class RealNumber : Number, IEquatable<double>, IEquatable<int>
     {
         /// <summary>
         /// Creates a new instance of the RealNumber class
@@ -42,5 +42,40 @@ namespace Lynx.Core.Numbers
         /// Does nothig for a real number
         /// </summary>
         public void Regenerate(){ }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <returns>
+        /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+        /// </returns>
+        /// <param name="other">An object to compare with this object.</param>
+        public bool Equals(double other)
+        {
+            return Value.Equals(other);
+        }
+
+        /// <summary>
+        /// Indicates whether the current object is equal to another object of the same type.
+        /// </summary>
+        /// <returns>
+        /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+        /// </returns>
+        /// <param name="other">An object to compare with this object.</param>
+        public bool Equals(int other)
+        {
+            return Value.Equals(other);
+        }
+
+        /// <summary>
+        /// Returns a string that represents the current object.
+        /// </summary>
+        /// <returns>
+        /// A string that represents the current object.
+        /// </returns>
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
 }

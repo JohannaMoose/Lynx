@@ -1,10 +1,11 @@
-﻿using Lynx.Core;
+﻿using System;
+using Lynx.Core;
 using Lynx.Core.Numbers;
 using NUnit.Framework;
 
 namespace Lynx.Tests.UnitTests.Core.Numbers
 {
-    [TestFixture]
+    [TestFixture][SetCulture("en-US")]
     public class RealNumber_Specs
     {
         private RealNumber SUT;
@@ -25,6 +26,18 @@ namespace Lynx.Tests.UnitTests.Core.Numbers
         public void should_be_Number()
         {
             Assert.IsInstanceOf<Number>(SUT);
+        }
+
+        [Test]
+        public void should_be_IEquatable_double()
+        {
+            Assert.IsInstanceOf<IEquatable<double>>(SUT);
+        }
+
+        [Test]
+        public void should_be_IEquatable_int()
+        {
+            Assert.IsInstanceOf<IEquatable<int>>(SUT);
         }
 
         #region Constructor
@@ -72,5 +85,80 @@ namespace Lynx.Tests.UnitTests.Core.Numbers
         }
 
         #endregion Regenerate
+
+        #region ToString
+
+        [Test]
+        public void toSTring_should_return_the_double_value()
+        {
+            // Given 
+            SUT = new RealNumber(5.1);
+
+            // When 
+            var result = SUT.ToString();
+
+            // Then
+            Assert.AreEqual("5.1", result);
+        }
+
+        #endregion ToString
+
+        #region equals double
+
+        [Test]
+        public void equalsDouble_should_return_true_if_same_value()
+        {
+            // Given 
+            SUT = new RealNumber(5.1);
+
+            // Then
+            Assert.IsTrue(SUT.Equals(5.1));
+        }
+
+        [Test]
+        public void equalsDouble_should_return_false_if_not_same_value()
+        {
+            // Given 
+            SUT = new RealNumber(5.1);
+
+            // Then
+            Assert.IsFalse(SUT.Equals(1.1));
+        }
+
+        #endregion equals double
+
+        #region Equals int
+
+        [Test]
+        public void equalsInt_should_return_true_if_same()
+        {
+            // Given 
+            SUT = new RealNumber(5);
+
+            // Then
+            Assert.IsTrue(SUT.Equals(5));
+        }
+
+        [Test]
+        public void equalInt_should_return_false_if_other_value()
+        {
+            // Given 
+            SUT = new RealNumber(5);
+
+            // Then
+            Assert.IsFalse(SUT.Equals(1));
+        }
+
+        [Test]
+        public void equalsInt_should_return_false_if_value_is_double()
+        {
+            // Given 
+            SUT = new RealNumber(5.1);
+
+            // Then
+            Assert.IsFalse(SUT.Equals(5));
+        }
+
+        #endregion Equals int
     }
 }

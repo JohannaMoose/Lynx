@@ -10,7 +10,7 @@ namespace Lynx.Core.Numbers
         private readonly int _lowerBoundery;
         private readonly int _upperBoundery;
         private int _value;
-        private readonly Random _valueGenerator;
+        private static Random _valueGenerator;
 
         /// <summary>
         /// Creates a new instance of the RandomInteger class
@@ -26,9 +26,10 @@ namespace Lynx.Core.Numbers
         {
             _lowerBoundery = lowerBoundery;
             _upperBoundery = upperBoundery;
-            _valueGenerator = new Random();
             Regenerate();
         }
+
+        private static Random valueGenerator => _valueGenerator ?? (_valueGenerator = new Random());
 
         /// <summary>
         /// Get the number that is represented by the number 
@@ -49,7 +50,7 @@ namespace Lynx.Core.Numbers
         /// </summary>
         public void Regenerate()
         {
-            _value = _valueGenerator.Next(_lowerBoundery, _upperBoundery);
+            _value = valueGenerator.Next(_lowerBoundery, _upperBoundery);
         }
     }
 }

@@ -41,7 +41,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExpressionParser.cs" />
+    <Compile Include="Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TextParsing\AdditionTextParser.cs" />
+    <Compile Include="TextParsing\TextParser.cs" />
+    <Compile Include="TextParsing\VariableTextParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lynx.Core\Lynx.Core.csproj">
@@ -49,6 +53,7 @@
       <Name>Lynx.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

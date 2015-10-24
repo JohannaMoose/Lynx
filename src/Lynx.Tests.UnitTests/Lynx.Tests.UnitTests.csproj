@@ -64,9 +64,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Conditions\NotEquals_Specs.cs" />
+    <Compile Include="Core\Conditions\Equals_Specs.cs" />
+    <Compile Include="Core\Conditions\LessThan_Specs.cs" />
+    <Compile Include="Core\Numbers\AbsoluteNumber_Specs.cs" />
     <Compile Include="Core\Numbers\RandomInteger_Specs.cs" />
     <Compile Include="Core\Numbers\RealNumber_Specs.cs" />
+    <Compile Include="Core\Operators\Division_Specs.cs" />
+    <Compile Include="Core\Operators\Multiplication_Specs.cs" />
     <Compile Include="Core\Operators\Addition_Specs.cs" />
+    <Compile Include="Core\Operators\Subtraction_Specs.cs" />
+    <Compile Include="Parsing\FromText\ExpressionParser_Text_Addition_Specs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Variable_Specs.cs" />
   </ItemGroup>
@@ -75,6 +83,10 @@
       <Project>{E4A46252-D927-45A0-B87A-D6F5A9438AFD}</Project>
       <Name>Lynx.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Lynx.Parsing\Lynx.Parsing.csproj">
+      <Project>{9655CC88-895C-4555-A7C4-F072BE780742}</Project>
+      <Name>Lynx.Parsing</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -82,9 +94,7 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Parsing\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

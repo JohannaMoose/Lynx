@@ -6,12 +6,12 @@ namespace Lynx.Core.Operators
     /// <summary>
     /// Addition operator for two numbers
     /// </summary>
-    public class Addition : BaseOperator
+    public class Multiplication : BaseOperator
     {
         /// <summary>
         /// Creates a new instance of the Addition class with the two numbers to add
         /// </summary>
-        protected Addition() { }
+        protected Multiplication() { }
 
         /// <summary>
         /// Creates a new instance of the Addition class with the two numbers to add
@@ -19,7 +19,7 @@ namespace Lynx.Core.Operators
         /// <param name="left">The left number to add</param>
         /// <param name="right">The rigth number to add</param>
         /// <exception cref="ArgumentNullException">Thrown if either of the numbers are null</exception>
-        public Addition(Number left, Number right)
+        public Multiplication(Number left, Number right)
             :base(left, right)
         { }
 
@@ -33,7 +33,7 @@ namespace Lynx.Core.Operators
         /// </returns>
         protected override RealNumber calculate(double left, double right)
         {
-            return new RealNumber(left + right);
+            return new RealNumber(left * right);
         }
     }
 }
