@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using Lynx.Core;
@@ -27,11 +28,12 @@ namespace Lynx.Parsing.TextParsing
         /// <param name="text">The text to parse.
         ///  The StringBuilder will be affected, the parsed text will remove the text that it parsed</param>
         /// <param name="leftNumber">The number that is to the left of the text currently parsing</param>
+        /// <param name="variables">The variables that are active for the current parsing</param>
         /// <returns>
         /// The resulting number of the parse
         /// </returns>
         /// <exception cref="ArgumentException">Thrown if the text can't be parsed by the parser</exception>
-        public Number Parse(StringBuilder text, Number leftNumber)
+        public Number Parse(StringBuilder text, Number leftNumber, IReadOnlyDictionary<string, Variable> variables)
         {
             var currentText = text.ToString();
             if (!CanParse(currentText))

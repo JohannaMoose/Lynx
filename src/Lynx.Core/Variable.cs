@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Lynx.Core.Conditions;
 using Lynx.Core.Numbers;
 
 namespace Lynx.Core
@@ -8,6 +11,8 @@ namespace Lynx.Core
     /// </summary>
     public class Variable : Number
     {
+        private List<Condition> _conditions;
+
         /// <summary>
         /// Creates a new instance of the Variable class
         /// </summary>
@@ -26,6 +31,39 @@ namespace Lynx.Core
 
             Designation = designation;
             Value = value; 
+            Conditions = new List<Condition>();
+        }
+
+        /// <summary>
+        /// Creates a new instance of the Variable class
+        /// </summary>
+        /// <param name="designation">The designation of the variable</param>
+        /// <param name="value">The value the variable should hold</param>
+        /// <param name="condition">A list of conditions for what values the variable can take</param>
+        /// <exception cref="ArgumentNullException">Thrown if the designation is null, empty or just whitespace</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the value can't take a number that meets the conditions</exception>
+        public Variable(string designation, Number value, IEnumerable<Condition> condition)
+        {
+            if (string.IsNullOrWhiteSpace(designation))
+                throw new ArgumentNullException(nameof(designation), "The designation was null, empty or just white space and that is not allowd");
+            if(value == null)
+                throw new ArgumentNullException(nameof(value), "The value was null and that is not allowd");
+            if(condition == null)
+                throw new ArgumentNullException(nameof(condition), "The condition was null and that is not allowd");
+
+          
+            Designation = designation;
+            Conditions = condition;
+            Value = value;
+
+            if (_conditions.Any() && !_conditions.Any(x => x.ConditionMeet))
+            {
+                var tries = getNewAllowedNbr();
+                if(tries >= 100)
+                    throw new ArgumentOutOfRangeException(nameof(value), "Value can't take a number that is accepted by the conditions");
+            }
+
+            
         }
 
         /// <summary>
@@ -39,14 +77,12 @@ namespace Lynx.Core
         public Number Value { get; private set; }
 
         /// <summary>
-        /// Get/Set the value that the variable represents. 
-        /// It won't update after the first value is set
+        /// Get the conditions of the variable for what values it can take
         /// </summary>
-        /// <param name="number">The value to assign to the variable</param>
-        public void SetValue(Number number)
+        public IEnumerable<Condition> Conditions
         {
-            if(Value == null)
-                Value = number; 
+            get { return _conditions; }
+            private set { _conditions = value.ToList(); }
         }
 
         /// <summary>
@@ -69,7 +105,23 @@ namespace Lynx.Core
         /// </summary>
         public void Regenerate()
         {
-            Value.Regenerate();
+            if (Value == null)
+                return;
+
+            getNewAllowedNbr();
+        }
+
+        private int getNewAllowedNbr()
+        {
+            var counter = 0;
+
+            do
+            {
+                Value.Regenerate();
+                counter++;
+            } while (_conditions.Any() && !Conditions.Any(x => x.ConditionMeet)&& counter < 100);
+
+            return counter;
         }
     }
 }

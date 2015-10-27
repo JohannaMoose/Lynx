@@ -65,7 +65,7 @@ namespace Lynx.Parsing.TextParsing
             return (
                 from parser in Parsers
                 where parser.CanParse(currentText)
-                select parser.Parse(text, leftNumber)
+                select parser.Parse(text, leftNumber, null)
                 ).FirstOrDefault();
         }
     }

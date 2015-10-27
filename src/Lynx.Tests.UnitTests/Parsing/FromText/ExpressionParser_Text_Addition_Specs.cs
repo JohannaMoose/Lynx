@@ -25,7 +25,7 @@ namespace Lynx.Tests.UnitTests.Parsing.FromText
         public void fromText_should_set_random_value_of_variable_with_constrictions()
         {
             // When 
-            var result = ExpressionParser.FromText("a: [1,8] \n b: b: [1,8] && (a <=2 || b <= 2) \n a=b ");
+            var result = ExpressionParser.FromText("a: [1,8] \n b: [1,8] && (a <=2 || b <= 2) \n a=b ");
            
             // Then
             for (var i = 0; i < 100; i++)
