@@ -41,11 +41,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExpressionParser.cs" />
-    <Compile Include="Parser.cs" />
+    <Compile Include="OperatorCreator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TextParsing\AdditionTextParser.cs" />
+    <Compile Include="TextParsing\AdditionTextOperatorCreator.cs" />
+    <Compile Include="TextParsing\Conditions\LessThanTextParser.cs" />
+    <Compile Include="TextParsing\Infix.cs" />
     <Compile Include="TextParsing\TextParser.cs" />
-    <Compile Include="TextParsing\VariableTextParser.cs" />
+    <Compile Include="TextParsing\VariableTextOperatorCreator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lynx.Core\Lynx.Core.csproj">

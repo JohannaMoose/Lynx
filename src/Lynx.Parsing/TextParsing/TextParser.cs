@@ -1,72 +1,113 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Lynx.Core;
+using Lynx.Core.Numbers;
 
 namespace Lynx.Parsing.TextParsing
 {
     internal class TextParser
     {
-        private static readonly List<Parser> Parsers = new List<Parser>
+        public static readonly Dictionary<string, OperatorCreator> Operators = new Dictionary<string, OperatorCreator>
         {
-            new AdditionTextParser(),
-            new VariableTextParser()
+            {"+", new AdditionTextOperatorCreator()}
         };
-
-        StringBuilder _text;
-
-        readonly List<Variable> _variables = new List<Variable>(); 
 
         public Expression ParseExpression(string text)
         {
-            var expression = new Expression();
-            _text = new StringBuilder(text);
-            Number left = null;
+            var sb = new StringBuilder(text);
 
-            while (_text.Length > 0)
+            var variables = getVariables(sb);
+
+            var equalIndex = sb.ToString().IndexOf("=", StringComparison.Ordinal);
+            return new Expression
             {
-                var nextPart = ParseNextValue(left, _text);
-                left = nextPart;
+                LeftSide = ParseText(sb.ToString(0, equalIndex), variables),
+                RightSide = ParseText(sb.ToString(equalIndex + 1, sb.Length - equalIndex-1), variables)
+            };
+        }
 
-                var part = nextPart as Variable;
-                if (part?.Value != null)
-                {
-                    _variables.Add(part);
-                }else if (part != null)
-                {
-                    var variable = _variables.SingleOrDefault(x => x.Designation == part.Designation);
-                    left = variable; 
-                }
-
-                if (_text.Length > 0 && _text.ToString(0, 1) == "=")
-                {
-                    expression.LeftSide = left;
-                    _text.Remove(0, 1);
-                }
-
-                removePadding();
+        private static Dictionary<string, Variable> getVariables(StringBuilder sb)
+        {
+            var varParser = new VariableTextOperatorCreator();
+            var variables = new Dictionary<string, Variable>();
+            while (varParser.CanParse(sb.ToString()))
+            {
+                var variable = varParser.Parse(sb, variables) as Variable;
+                variables.Add(variable.Designation, variable);
+                removePadding(sb);
             }
 
-            expression.RightSide = left; 
-
-            return expression;
+            return variables; 
         }
 
-        private void removePadding()
+        private static void removePadding(StringBuilder sb)
         {
-            var current = _text.ToString().Trim();
-            _text.Clear();
-            _text.Append(current);
+            var current = sb.ToString().Trim();
+            sb.Clear();
+            sb.Append(current);
         }
 
-        public static Number ParseNextValue(Number leftNumber, StringBuilder text)
+        public static Number ParseText(string text, IReadOnlyDictionary<string, Variable> variables)
         {
-            var currentText = text.ToString();
-            return (
-                from parser in Parsers
-                where parser.CanParse(currentText)
-                select parser.Parse(text, leftNumber, null)
-                ).FirstOrDefault();
+            var postFix = Infix.ToPostfix(text);
+            var stack = new Stack<Number>();
+            foreach (var val in individualElements(postFix))
+            {
+                if (Operators.ContainsKey(val))
+                {
+                    var op = createOperator(val, stack);
+                    stack.Push(op);
+                }
+                else if (variables.ContainsKey(val))
+                {
+                    var variable = getVariable(variables, val);
+                    stack.Push(variable);
+                }
+                else
+                {
+                    var nbr = createNbr(val);
+                    if(nbr != null)
+                        stack.Push(nbr);
+                    else 
+                        throw new NotSupportedException("The string is not recogniezed as a value");
+                }
+            }
+            return stack.Pop();
+        }
+
+        private static IEnumerable<string> individualElements(string postFix)
+        {
+            return postFix.Split(new []{" "}, StringSplitOptions.RemoveEmptyEntries)
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => x.Trim());
+        }
+
+        private static Number createOperator(string val, Stack<Number> stack)
+        {
+            var creator = Operators.Single(x => x.Key == val).Value;
+            var nbrs = new List<Number>();
+            for (var i = 0; i < creator.NbrsForCreate; i++)
+            {
+                nbrs.Add(stack.Pop());
+            }
+            var op = creator.CreateForNbrs(nbrs.ToArray());
+            return op;
+        }
+
+        private static Variable getVariable(IReadOnlyDictionary<string, Variable> variables, string val)
+        {
+            var variable = variables.Single(x => x.Key == val).Value;
+            return variable;
+        }
+
+        private static RealNumber createNbr(string val)
+        {
+            double nbr;
+            var isNbr = double.TryParse(val, out nbr);
+            var realNbr = new RealNumber(nbr);
+            return isNbr ? realNbr : null; 
         }
     }
 }
