@@ -37,7 +37,7 @@ namespace Lynx.Tests.UnitTests.Core.Numbers
         public void constructor_should_set_number()
         {
             // Given 
-            var nbr = new Variable("a");
+            var nbr = new Variable("a", new RealNumber(1));
 
             // When 
             SUT = new AbsoluteNumber(nbr);

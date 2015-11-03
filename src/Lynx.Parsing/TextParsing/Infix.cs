@@ -10,9 +10,13 @@ namespace Lynx.Parsing.TextParsing
         {
             var stack = new Stack<string>();
             var output = new StringBuilder();
+            var tree = str.ToCharArray().Select(s => s.ToString()).ToList();
 
-            foreach (var c in str.ToCharArray().Select(s => s.ToString()))
+            var inside = false;
+
+            for (var i = 0; i < tree.Count(); i++)
             {
+                var c = tree[i];
                 if (!isOperator(c))
                     output.Append(c + " ");
                 else if (c == ")")
@@ -23,20 +27,28 @@ namespace Lynx.Parsing.TextParsing
                     }
                     stack.Pop();
                 }
+                else if (c == "|" && stack.Contains("|"))
+                {
+                    while (stack.Count > 0 && stack.Peek() != "|")
+                    {
+                        output.Append(stack.Pop() + " ");
+                    }
+                    output.Append(stack.Pop() + " ");
+                }
                 else if (stack.Count > 0 && !isLowerPrecedence(c, stack.Peek()))
                 {
                     stack.Push(c);
                 }
                 else
                 {
-                    var processing = c; 
+                    var processing = c;
                     while (stack.Count > 0 && isLowerPrecedence(c, stack.Peek()))
                     {
                         var s = stack.Pop();
                         if (c != "(")
                             output.Append(s + " ");
                         else
-                            processing = s; 
+                            processing = s;
                     }
                     stack.Push(processing);
                 }
@@ -61,7 +73,7 @@ namespace Lynx.Parsing.TextParsing
             {
                 case "+":
                 case "-":
-                    return !(op2 == "+" || op2 == "-");
+                    return !(op2 == "+" || op2 == "-" || op2 == "|");
                 case "*":
                 case "/":
                     return op2 == "^" || op2 == "(";

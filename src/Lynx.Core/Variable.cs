@@ -24,46 +24,18 @@ namespace Lynx.Core
         /// <param name="designation">The designation of the variable</param>
         /// <param name="value">The value the variable should hold</param>
         /// <exception cref="ArgumentNullException">Thrown if the designation is null, empty or just whitespace</exception>
-        public Variable(string designation, Number value = null)
-        {
-            if(string.IsNullOrWhiteSpace(designation))
-                throw new ArgumentNullException(nameof(designation), "The designation was null, empty or just white space and that is not allowd");
-
-            Designation = designation;
-            Value = value; 
-            Conditions = new List<Condition>();
-        }
-
-        /// <summary>
-        /// Creates a new instance of the Variable class
-        /// </summary>
-        /// <param name="designation">The designation of the variable</param>
-        /// <param name="value">The value the variable should hold</param>
-        /// <param name="condition">A list of conditions for what values the variable can take</param>
-        /// <exception cref="ArgumentNullException">Thrown if the designation is null, empty or just whitespace</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown if the value can't take a number that meets the conditions</exception>
-        public Variable(string designation, Number value, IEnumerable<Condition> condition)
+        /// 
+        public Variable(string designation, Number value)
         {
             if (string.IsNullOrWhiteSpace(designation))
                 throw new ArgumentNullException(nameof(designation), "The designation was null, empty or just white space and that is not allowd");
             if(value == null)
                 throw new ArgumentNullException(nameof(value), "The value was null and that is not allowd");
-            if(condition == null)
-                throw new ArgumentNullException(nameof(condition), "The condition was null and that is not allowd");
 
           
             Designation = designation;
-            Conditions = condition;
             Value = value;
-
-            if (_conditions.Any() && !_conditions.Any(x => x.ConditionMeet))
-            {
-                var tries = getNewAllowedNbr();
-                if(tries >= 100)
-                    throw new ArgumentOutOfRangeException(nameof(value), "Value can't take a number that is accepted by the conditions");
-            }
-
-            
+            Conditions = new List<Condition>();
         }
 
         /// <summary>
@@ -122,6 +94,30 @@ namespace Lynx.Core
             } while (_conditions.Any() && !Conditions.Any(x => x.ConditionMeet)&& counter < 100);
 
             return counter;
+        }
+
+        /// <summary>
+        /// Set the conditions of the variable if they aren't set already
+        /// </summary>
+        /// <param name="conditions">The conditions to assign the variable, must be at least one</param>
+        /// <returns>
+        /// True if the conditions are set to the ones given when called the method, 
+        /// false if the conditions were already set and thus not updated
+        /// </returns>
+        /// <exception cref="ArgumentException">Thrown if the value can't take a number that meets the conditions</exception>
+        public bool SetConditions(params Condition[] conditions)
+        {
+            if (Conditions.Any())
+                return false;
+
+            Conditions = conditions;
+            if (_conditions.Any() && !_conditions.Any(x => x.ConditionMeet))
+            {
+                var tries = getNewAllowedNbr();
+                if (tries >= 100)
+                    throw new ArgumentException("Value can't take a number that is accepted by the conditions", nameof(conditions));
+            }
+            return true;
         }
     }
 }

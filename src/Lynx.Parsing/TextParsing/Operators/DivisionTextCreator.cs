@@ -2,14 +2,17 @@
 using Lynx.Core;
 using Lynx.Core.Operators;
 
-namespace Lynx.Parsing.TextParsing
+namespace Lynx.Parsing.TextParsing.Operators
 {
-    internal class AdditionTextOperatorCreator : OperatorCreator
+    /// <summary>
+    /// Creator for subtract objects
+    /// </summary>
+    internal class DivisionTextCreator : OperatorCreator
     {
         /// <summary>
         /// Get the number of numbers that is needed for creating a number with this parser
         /// </summary>
-        public int NbrsForCreate => 2; 
+        public int NbrsForCreate => 2;
 
         /// <summary>
         /// Create the number this parser handles with the numbers
@@ -21,9 +24,9 @@ namespace Lynx.Parsing.TextParsing
         public Number CreateForNbrs(params Number[] nbrs)
         {
             if(nbrs.Length != 2)
-                throw new ArgumentException("Addition needs exactly two numbers to add, more or less were provided");
+                throw  new ArgumentException("Division needs exactly 2 numbers, that is not what was provided");
 
-            return new Addition(nbrs[0], nbrs[1]);
+            return new Division(nbrs[1], nbrs[0]);
         }
     }
 }

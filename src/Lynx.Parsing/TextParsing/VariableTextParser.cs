@@ -11,7 +11,7 @@ using static System.String;
 
 namespace Lynx.Parsing.TextParsing
 {
-    internal class VariableTextOperatorCreator
+    internal class VariableTextParser
     {
         /// <summary>
         /// Checks to see if the parser can parse the text from the start, not the entire text
@@ -36,7 +36,7 @@ namespace Lynx.Parsing.TextParsing
         /// The resulting number of the parse
         /// </returns>
         /// <exception cref="ArgumentException">Thrown if the text can't be parsed by the parser</exception>
-        public Number Parse(StringBuilder text, IReadOnlyDictionary<string, Variable> variables)
+        public Number Parse(StringBuilder text, Dictionary<string, Variable> variables)
         {
             var currentText = text.ToString();
             if (!CanParse(currentText))
@@ -47,13 +47,18 @@ namespace Lynx.Parsing.TextParsing
             return createVariable(variableData.Value, variables);
         }
 
-        private static Variable createVariable(string text, IReadOnlyDictionary<string, Variable>variables)
+        private static Variable createVariable(string text, Dictionary<string, Variable>variables)
         {
             var designation = Regex.Match(text, "^[a-ö]+").Value;
             var value = getValue(text, variables);
-            var conditions = getConditions(text, variables, value, designation);
+            var variable = new Variable(designation, value);
 
-            return new Variable(designation, value, conditions);
+            variables.Add(designation, variable);
+
+            var conditions = getConditions(text, variables, value, designation);
+            variable.SetConditions(conditions.ToArray());
+
+            return variable;
         }
 
         private static Number getValue(string text, IReadOnlyDictionary<string, Variable> variables)
@@ -73,11 +78,13 @@ namespace Lynx.Parsing.TextParsing
             }
         }
 
-        private static Dictionary<Func<string, bool>, Func<string, IReadOnlyDictionary<string, Variable>, Number, string, Condition>> _conditionFactory = 
-            new Dictionary<Func<string, bool>, Func<string, IReadOnlyDictionary<string, Variable>, Number, string, Condition>>
+        private static readonly Dictionary<Func<string, bool>, Func<string, IReadOnlyDictionary<string, Variable>, Condition>> ConditionFactory = 
+            new Dictionary<Func<string, bool>, Func<string, IReadOnlyDictionary<string, Variable>, Condition>>
         {
                 {LessThanTextParser.IsLessThan, LessThanTextParser.ParseLessThan},
-                {LessThanTextParser.IsLessOrEqual, LessThanTextParser.ParseLessOrEqual}
+                {LessThanTextParser.IsLessOrEqual, LessThanTextParser.ParseLessOrEqual},
+                {EqualsTextParser.IsEqual, EqualsTextParser.ParseEquals },
+                {NotEqualsTextParser.IsNotEqual, NotEqualsTextParser.ParseEquals }
         }; 
 
         private static IEnumerable<Condition> getConditions(string text, IReadOnlyDictionary<string, Variable> variables, Number value, string designation)
@@ -87,15 +94,11 @@ namespace Lynx.Parsing.TextParsing
                 return new List<Condition>();
 
             var singleConditions = conditions.Groups[1].Value.Split(new[] {"||", "(", ")"}, StringSplitOptions.RemoveEmptyEntries);
-            var list = new List<Condition>();
 
-            foreach (var condition in singleConditions.Where(x => !IsNullOrWhiteSpace(x)))
-            {
-                var parse = _conditionFactory.SingleOrDefault(x => x.Key(condition));
-                list.Add(parse.Value(condition, variables, value, designation));
-            }
-
-            return list; 
+            return (from condition in singleConditions.Where(x => !IsNullOrWhiteSpace(x))
+                    let parse = ConditionFactory.SingleOrDefault(x => x.Key(condition))
+                    select parse.Value(condition, variables)
+                    ).ToList(); 
         } 
     }
 }

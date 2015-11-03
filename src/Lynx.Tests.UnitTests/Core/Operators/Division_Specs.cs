@@ -16,7 +16,7 @@ namespace Lynx.Tests.UnitTests.Core.Operators
         [SetUp]
         public void Setup()
         {
-            SUT = new Division(new Variable("a"), new Variable("b"));
+            SUT = new Division(new Variable("a", new RealNumber(1)), new Variable("b", new RealNumber(1)));
         }
 
         [TearDown]
@@ -37,10 +37,10 @@ namespace Lynx.Tests.UnitTests.Core.Operators
         public void constructor_should_set_left_number()
         {
             // Given 
-            var nbr = new Variable("a");
+            var nbr = new Variable("a", new RealNumber(1));
 
             // When 
-            SUT = new Division(nbr, new Variable("b"));
+            SUT = new Division(nbr, new Variable("b", new RealNumber(1)));
 
             // Then
             Assert.AreSame(nbr, SUT.LeftSide);
@@ -50,10 +50,10 @@ namespace Lynx.Tests.UnitTests.Core.Operators
         public void constructor_should_set_right_number()
         {
             // Given 
-            var nbr = new Variable("a");
+            var nbr = new Variable("a", new RealNumber(1));
 
             // When 
-            SUT = new Division(new Variable("b"), nbr);
+            SUT = new Division(new Variable("b", new RealNumber(1)), nbr);
 
             // Then
             Assert.AreSame(nbr, SUT.RightSide);
@@ -62,14 +62,14 @@ namespace Lynx.Tests.UnitTests.Core.Operators
         [Test]
         public void constructor_should_throw_if_left_is_null()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => new Division(null, new Variable("a")));
+            var ex = Assert.Throws<ArgumentNullException>(() => new Division(null, new Variable("a", new RealNumber(1))));
             Assert.AreEqual("The left number can't be null\r\nParameter name: left", ex.Message);
         }
 
         [Test]
         public void constructor_should_throw_if_right_is_null()
         {
-            var ex = Assert.Throws<ArgumentNullException>(() => new Division(new Variable("a"), null));
+            var ex = Assert.Throws<ArgumentNullException>(() => new Division(new Variable("a", new RealNumber(1)), null));
             Assert.AreEqual("The right number can't be null\r\nParameter name: right", ex.Message);
         }
 

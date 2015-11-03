@@ -43,11 +43,17 @@
     <Compile Include="ExpressionParser.cs" />
     <Compile Include="OperatorCreator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TextParsing\AdditionTextOperatorCreator.cs" />
+    <Compile Include="TextParsing\Conditions\NotEqualsTextParser.cs" />
+    <Compile Include="TextParsing\Conditions\EqualsTextParser.cs" />
+    <Compile Include="TextParsing\Operators\AbsolutTextCreator.cs" />
+    <Compile Include="TextParsing\Operators\AdditionTextCreator.cs" />
     <Compile Include="TextParsing\Conditions\LessThanTextParser.cs" />
     <Compile Include="TextParsing\Infix.cs" />
+    <Compile Include="TextParsing\Operators\DivisionTextCreator.cs" />
+    <Compile Include="TextParsing\Operators\MultiplicationTextCreator.cs" />
+    <Compile Include="TextParsing\Operators\SubtractionTextCreator.cs" />
     <Compile Include="TextParsing\TextParser.cs" />
-    <Compile Include="TextParsing\VariableTextOperatorCreator.cs" />
+    <Compile Include="TextParsing\VariableTextParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lynx.Core\Lynx.Core.csproj">

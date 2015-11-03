@@ -17,7 +17,7 @@ namespace Lynx.Tests.UnitTests.Core
         [SetUp]
         public void Setup()
         {
-            SUT = new Variable("a");
+            SUT = new Variable("a", new RealNumber(1));
         }
 
         [TearDown]
@@ -32,58 +32,13 @@ namespace Lynx.Tests.UnitTests.Core
             Assert.IsInstanceOf<Number>(SUT);
         }
 
-        #region Designation Constructor
-
-        [Test]
-        public void constructor_should_set_designation()
-        {
-            // When 
-            SUT = new Variable("a");
-
-            // Then
-            Assert.AreEqual("a", SUT.Designation);
-        }
-
-        [Test]
-        [TestCaseSource(nameof(EmptyStrings))]
-        public void constructor_should_throw_if_designation_is_null_or_empty(string str)
-        {
-            var ex = Assert.Throws<ArgumentNullException>(() => new Variable(str));
-            Assert.AreEqual("The designation was null, empty or just white space and that is not allowd\r\nParameter name: designation", ex.Message);
-        }
-
-        [Test]
-        public void constructor_should_set_vaule()
-        {
-            // Given 
-            var nbr = new RealNumber(5);
-
-            // When 
-            SUT = new Variable("a", nbr);
-
-            // Then
-            Assert.IsTrue(((RealNumber)SUT.Value).Equals(5));
-        }
-
-        [Test]
-        public void constructor_should_leave_value_as_null_if_nothing_set()
-        {
-            // When 
-            SUT = new Variable("a");
-
-            // Then
-            Assert.IsNull(SUT.Value);
-        }
-
-        #endregion Designation Constructor
-
         #region Full Constructor
 
         [Test]
         public void fullConstructor_should_set_designation()
         {
             // When 
-            SUT = new Variable("a", new RealNumber(1), new List<Condition>());
+            SUT = new Variable("a", new RealNumber(1));
 
             // Then
             Assert.AreEqual("a", SUT.Designation);
@@ -96,26 +51,10 @@ namespace Lynx.Tests.UnitTests.Core
             var nbr = new RealNumber(1);
 
             // When 
-            SUT = new Variable("a", nbr, new List<Condition>());
+            SUT = new Variable("a", nbr);
 
             // Then
             Assert.AreSame(nbr, SUT.Value);
-        }
-
-        [Test]
-        public void fullConstructor_should_set_conditions()
-        {
-            // Given 
-            var list = new List<Condition>
-            {
-                new Equals(new RealNumber(1), new RealNumber(1))
-            };
-
-            // When 
-            SUT = new Variable("a", new RealNumber(1), list);
-
-            // Then
-            CollectionAssert.AreEqual(list, SUT.Conditions);
         }
 
         [Test]
@@ -128,7 +67,7 @@ namespace Lynx.Tests.UnitTests.Core
             // Then
             var ex =
                 Assert.Throws<ArgumentNullException>(
-                    () => SUT = new Variable(null, new RealNumber(1), new List<Condition>()));
+                    () => SUT = new Variable(null, new RealNumber(1)));
             Assert.AreEqual("The designation was null, empty or just white space and that is not allowd\r\nParameter name: designation", ex.Message);
 
         }
@@ -142,35 +81,8 @@ namespace Lynx.Tests.UnitTests.Core
 
             // Then
             var ex = Assert.Throws<ArgumentNullException>(
-             () => SUT = new Variable("a", null, new List<Condition>()));
+             () => SUT = new Variable("a", null));
             Assert.AreEqual("The value was null and that is not allowd\r\nParameter name: value", ex.Message);
-        }
-
-        [Test]
-        public void fullConstructor_should_throw_if_conditions_is_null()
-        {
-            // Given 
-
-            // When 
-
-            // Then
-            var ex = Assert.Throws<ArgumentNullException>(
-             () => SUT = new Variable("a", new RealNumber(1), null));
-            Assert.AreEqual("The condition was null and that is not allowd\r\nParameter name: condition", ex.Message);
-        }
-
-        [Test]
-        public void fullConstructor_should_throw_if_value_cant_take_value_that_matches_conditions()
-        {
-            // Given 
-            var rand = new RandomInteger(5, 10);
-            var leq = new LessThan(rand, new RealNumber(2));
-
-            // Then
-            var ex =
-                Assert.Throws<ArgumentOutOfRangeException>(
-                    (() => SUT = new Variable("a", rand, new List<Condition> {leq})));
-            Assert.AreEqual("Value can't take a number that is accepted by the conditions\r\nParameter name: value", ex.Message);
         }
 
         #endregion Full Constructor
@@ -182,20 +94,13 @@ namespace Lynx.Tests.UnitTests.Core
         {
             // Given 
             var nbr = new Mock<Number>();
-            SUT = new Variable("a", nbr.Object, new List<Condition>());
+            SUT = new Variable("a", nbr.Object);
 
             // When 
             SUT.Regenerate();
 
             // Then
             nbr.Verify(x => x.Regenerate(), Times.Once);
-        }
-
-        [Test]
-        public void regenerate_should_do_nothing_if_no_value_is_set()
-        {
-            // Then
-            Assert.DoesNotThrow((() => SUT.Regenerate()));
         }
 
         [Test]
@@ -206,7 +111,8 @@ namespace Lynx.Tests.UnitTests.Core
             var rand = new RandomInteger(1, 4);
             var leq = new LessThan(rand, new RealNumber(2));
 
-            SUT = new Variable("a", rand, new List<Condition> {leq});
+            SUT = new Variable("a", rand);
+            SUT.SetConditions(leq);
 
             // When 
             SUT.Regenerate();
@@ -216,6 +122,88 @@ namespace Lynx.Tests.UnitTests.Core
         }
 
         #endregion Regenerate
+
+        #region SetConditions
+
+        [Test]
+        public void setConditions_should_set_conditions()
+        {
+            // Given 
+            var list = new List<Condition>
+            {
+                new LessThan(new RealNumber(1), new RealNumber(2))
+            };
+
+            // When 
+            SUT.SetConditions(list.ToArray());
+
+            // Then
+            CollectionAssert.AreEqual(list, SUT.Conditions);
+        }
+
+        [Test]
+        public void setConditions_should_return_true_when_set()
+        {
+            // Given 
+            var list = new List<Condition>
+            {
+                new LessThan(new RealNumber(1), new RealNumber(2))
+            };
+
+            // When 
+            var result =  SUT.SetConditions(list.ToArray());
+
+            // Then
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void setConditions_should_not_update_if_already_set()
+        {
+            // Given 
+            var list = new List<Condition>
+            {
+                new LessThan(new RealNumber(1), new RealNumber(2))
+            };
+            SUT.SetConditions(new LessThan(new RealNumber(4), new RealNumber(5)));
+
+            // When 
+            SUT.SetConditions(list.ToArray());
+
+            // Then
+            CollectionAssert.AreNotEqual(list, SUT.Conditions);
+        }
+
+        [Test]
+        public void setConditions_should_return_false_when_not_updating()
+        {
+            // Given 
+            var list = new List<Condition>
+            {
+                new LessThan(new RealNumber(1), new RealNumber(2))
+            };
+            SUT.SetConditions(new LessThan(new RealNumber(4), new RealNumber(5)));
+
+            // When 
+            var result = SUT.SetConditions(list.ToArray());
+
+            // Then
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void setCondtions_should_throw_if_value_cant_match_conditions()
+        {
+            // Given
+            SUT = new Variable("a", new RandomInteger(3, 5)); 
+
+            // Then
+            var ex =
+                Assert.Throws<ArgumentException>(() => SUT.SetConditions(new LessThan(SUT.Value, new RealNumber(2))));
+            Assert.AreEqual("Value can't take a number that is accepted by the conditions\r\nParameter name: conditions", ex.Message);
+        }
+
+        #endregion SetConditions
 
         #region TestHelpers
 

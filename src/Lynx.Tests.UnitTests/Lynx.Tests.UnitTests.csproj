@@ -75,6 +75,7 @@
     <Compile Include="Core\Operators\Addition_Specs.cs" />
     <Compile Include="Core\Operators\Subtraction_Specs.cs" />
     <Compile Include="Parsing\FromText\ExpressionParser_Text_Addition_Specs.cs" />
+    <Compile Include="Parsing\FromText\ExpressionParser_Text_Variables_Specs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Variable_Specs.cs" />
   </ItemGroup>

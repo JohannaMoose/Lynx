@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Lynx.Core;
 using Lynx.Core.Numbers;
+using Lynx.Parsing.TextParsing.Operators;
 
 namespace Lynx.Parsing.TextParsing
 {
@@ -11,7 +12,11 @@ namespace Lynx.Parsing.TextParsing
     {
         public static readonly Dictionary<string, OperatorCreator> Operators = new Dictionary<string, OperatorCreator>
         {
-            {"+", new AdditionTextOperatorCreator()}
+            {"+", new AdditionTextCreator()},
+            {"-", new SubtractionTextCreator() },
+            { "|", new AbsolutTextCreator() },
+            {"*", new MultiplicationTextCreator() },
+            {"/", new DivisionTextCreator() }
         };
 
         public Expression ParseExpression(string text)
@@ -30,12 +35,11 @@ namespace Lynx.Parsing.TextParsing
 
         private static Dictionary<string, Variable> getVariables(StringBuilder sb)
         {
-            var varParser = new VariableTextOperatorCreator();
+            var varParser = new VariableTextParser();
             var variables = new Dictionary<string, Variable>();
             while (varParser.CanParse(sb.ToString()))
             {
-                var variable = varParser.Parse(sb, variables) as Variable;
-                variables.Add(variable.Designation, variable);
+                varParser.Parse(sb, variables);
                 removePadding(sb);
             }
 
